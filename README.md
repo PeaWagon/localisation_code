@@ -27,7 +27,7 @@ As for the code:
 6. Reply to prompts, images should autogenerate
 
 ## Prompts
-The code will prompt for 2-4 things:
+The code will prompt for 2-4 things:  
 1. folder identifier
 2. whether or not to organise by localisation
 3. Enter the distance from the ends of the cells that are considered for having
