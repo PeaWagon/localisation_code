@@ -28,12 +28,12 @@ As for the code:
 
 ## Prompts
 The code will prompt for 2-4 things:  
-1. folder identifier
-2. whether or not to organise by localisation
+1. folder identifier  
+2. whether or not to organise by localisation  
 3. Enter the distance from the ends of the cells that are considered for having
-  higher localisation
+  higher localisation  
 4. Enter the percent that the ends have to be higher than the middle average
-  such that these are considered localised fluorescence
+  such that these are considered localised fluorescence  
 
 ## CMD Notes
 To navigate the filesystem on windows, you first need to know where you files are located, and on which drive they are located. The drive name is usually C:, but if you are using a USB stick, it can be other letters (F:, E:, D:, etc.). To figure out what drive you want, you can look up the letter in My Computer.   
