@@ -277,25 +277,26 @@ def do_analysis(ilist, olist, operating_system):
         
 #############################################################################
 
-"""
-# main intro
-dir_ID = print_intro()
-current_OS = det_OS()
+choice = input("Analyse folders of files (1) or pre-formatted csv files (2) ? ")
 
-# execute OS-relevant commands for file preparation
-if current_OS == 'linux' or current_OS == 'windows':
-    prep_for(current_OS, dir_ID)
-else: 
-    try: prep_for('linux', dir_ID)
-    except: prep_for('windows', dir_ID)   
+if choice == '1':
+    # main intro
+    dir_ID = print_intro()
+    current_OS = det_OS()
 
-"""
+    # execute OS-relevant commands for file preparation
+    if current_OS == 'linux' or current_OS == 'windows':
+        prep_for(current_OS, dir_ID)
+    else: 
+        try: prep_for('linux', dir_ID)
+        except: prep_for('windows', dir_ID)   
 
-temp_list = ['cls-all.csv', 'cls+all.csv']
-temp_olist = ['cls-all_output.csv', 'cls+all_output.csv']
-
-for i in range(len(temp_list)):
-    do_analysis(temp_list[i], temp_olist[i], 'linux')
+elif choice == '2':
+    temp_list = ['cls-all.csv', 'cls+all.csv']
+    temp_olist = ['cls-all_output.csv', 'cls+all_output.csv']
+    for i in range(len(temp_list)):
+	print("Analysing "+str(temp_list[i]))
+        do_analysis(temp_list[i], temp_olist[i], 'linux')
     
     
     
