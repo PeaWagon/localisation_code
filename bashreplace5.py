@@ -5,36 +5,6 @@
 # using python.
 # it will hopefully work on Windows OS and Linux OS
 
-
-# STILL TO DO
-# JANUARY 24, 2017
-# Code does not distinguish between cells having a unipole 
-# that is directional. The issue here being that the cells are grouped
-# according to having 1, 2, or no polar localisation. If the unipole cells
-# are half right poles and half left poles, the average plot will show
-# a bias. 
-
-# Make reading in data more robust.
-# Note the files can be saved as csv or txt format
-# which means I need to be able to read in both versions.
-# Also I want to change how the data is read in. It should
-# search for the intensity column rather than the code
-# specifying where the data is (which could be problematic
-# if someone saves the data in another order, uses different 
-# column labels, etc.)
-
-
-#############################################################################
-""" Help notes
-
-    for windows cmd: (note case insensitive, can use \ or /)
-    cd - display current directory
-    cd.. - go up one level
-    cd \dir\name - go to name directory
-    f: - change to F drive (i.e. USB stick)
-    dir - display contents of folder
-    
-"""
 #############################################################################
 
 import sys
