@@ -14,6 +14,8 @@ from textwrap import wrap
 
 #############################################################################
 
+# test github commands
+
 # start here
 
 def print_intro():
@@ -268,6 +270,7 @@ elif choice == '2':
         print("Analysing "+str(temp_list[i]))
         do_analysis(temp_list[i], temp_olist[i], 'linux')
     
+print('Done')
     
     
     
