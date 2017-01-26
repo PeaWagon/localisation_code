@@ -271,8 +271,7 @@ elif choice == '2':
         do_analysis(temp_list[i], temp_olist[i], 'linux')
     
 print('Done')
-    
-    
+print("IT WORKS")
     
     
     
