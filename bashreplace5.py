@@ -265,7 +265,7 @@ elif choice == '2':
     temp_list = ['cls-all.csv', 'cls+all.csv']
     temp_olist = ['cls-all_output.csv', 'cls+all_output.csv']
     for i in range(len(temp_list)):
-	print("Analysing "+str(temp_list[i]))
+        print("Analysing "+str(temp_list[i]))
         do_analysis(temp_list[i], temp_olist[i], 'linux')
     
     
