@@ -80,9 +80,10 @@ def make_group_list(dir_ID, current_OS):
         if dir_ID in ff:
             # try to open the folder, otherwise it's a file
             try:
-                os.chdir(dir_ID)
+                os.chdir(ff)        # try to cd to folder
+                os.chdir(start_dir) # if successful, return to start_dir
                 make_list.append(ff+'.csv')
-            except FileNotFoundError:
+            except (NotADirectoryError, FileNotFoundError) as e:
                 print(ff+" is not a directory. Skipping.")
     # if no folders are found, return error
     if len(make_list) == 0:
@@ -133,6 +134,7 @@ def prep_for(operating_system, make_list):
         # set all files to a list, collect subset of text files (.txt)
         print("Analysing files in: "+str(group[:-4]))
         print("If there are any unrelated '.txt' or '.csv' files in this folder, this may cause errors. Open files may also cause errors.")
+        print()
         ls_all_subdir = os.listdir(start_dir+'/'+str(group[:-4]))
         for ff_subdir in ls_all_subdir:
             if '.txt' in ff_subdir:
