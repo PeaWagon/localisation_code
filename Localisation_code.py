@@ -1,9 +1,7 @@
 # object orientated programming version of analysis code for cells
 
-# new version that is intended for multiple OS compatibility
-
 # JEN
-# January 23rd, 2017
+# January 27th, 2017
 
 ############################################################################
 
@@ -86,9 +84,15 @@ class Localisation(object):
             query = input("Sort files by their localisation patterns? (Y/n) ")
         if query == 'Y':
             self.sorter = True
-            self.get_local_values() # determine pdiff and dcutoff
-            self.organise_cells()   # sort cells by localisation
-            self.write_cell_local() # write data to a csv file
+            self.get_local_values()         # determine pdiff and dcutoff
+            q1 = self.organise_cells()      # sort cells by localisation
+            while q1 == 'error':            # if ill-defined ends
+                self.local0 = {}            # reset dictionaries
+                self.local1 = {}
+                self.local2 = {}
+                self.get_local_values()     # reset pdfiff and dcutoff
+                q1 = self.organise_cells()  # try again
+            self.write_cell_local()         # write data to a csv file
             return True
         elif query == 'n':
             self.sorter = False
@@ -136,6 +140,8 @@ class Localisation(object):
             
             """
             middle_values = self.sort_middle(key)
+            if middle_values == 'error':
+                return 'error'
            
             det_localisation = self.sort_cell(key, middle_values)
            
@@ -154,7 +160,7 @@ class Localisation(object):
                 self.dict1[key][1] = self.dict1[key][1][::-1]
                 # add to local1
                 self.local1[key] = self.dict1[key]
-#### !!!                
+                
     def write_cell_local(self):
         """ (5) write data to .csv file for reference
             (6) print number of cells in each group
@@ -191,27 +197,22 @@ class Localisation(object):
         key_dists = self.dict1[key][1]
         key_intens = self.dict1[key][0]
         
-        # just in case key's distances are somehow reversed
-        if key_dists[0] == 1.0 and key_dists[-1] == 0:
-            print("Warning. Cell "+str(key)+" has its normalised distance values reversed.")
-            for i, valuea in enumerate(key_dists):
-                if valuea < 1-self.dcutoff:
-                    middle_start_index = i-1
-                    break
-            for i, valueb in enumerate(key_dists):
-                if valueb < self.dcutoff:
-                    middle_end_value = i-1
-                    break
-      
+        if key_dists[1] > self.dcutoff:
+            print("Error. Cell "+str(key)+" only has one data point to define its end. Please increase the value for distance cut-off.")
+            return 'error'
+        elif key_dists[-2] < 1-self.dcutoff:
+            print("Error. Cell "+str(key)+" only has one data point to define its end. Please increase the value for distance cut-off.")
+            return 'error' 
+  
         # key's normalised distances go from 0-1
         elif key_dists[0] == 0 and key_dists[-1] == 1.0:
             for i, value in enumerate(key_dists):
                 if value > self.dcutoff:
                     middle_start_index = i
                     break
-            for i, value2 in enumerate(key_dists):
+            for i2, value2 in enumerate(key_dists):
                 if value2 > 1-self.dcutoff:
-                    middle_end_index = i-1
+                    middle_end_index = i2-1
                     break        
         
         middle_int_values = key_intens[middle_start_index:middle_end_index+1]
@@ -222,14 +223,8 @@ class Localisation(object):
         try:
             av_middle = sum(middle_int_values)/len(middle_int_values)
         except ZeroDivisionError:
-            print(self.dict1[key][0])
-            print(self.dict1[key][1])
             print("The cell "+str(key)+' has an empty set of middle values, which has caused a division by zero. Please re-enter the distance cut-off.')
-            self.local0 = {}
-            self.local1 = {}
-            self.local2 = {}
-            self.get_local_values()
-            self.organise_cells()
+            return 'error'
         
         return [middle_start_index, middle_end_index, av_middle]
         
@@ -238,6 +233,9 @@ class Localisation(object):
             returns l1 if localisation is found at left pole ONLY
             returns r1 if localisation is found at right pole ONLY
             returns 2 if localisation is found at both poles
+            note: localisation means that the AVERAGE value at 
+            either pole is higher (by pdiff %) than the average 
+            value in the middle of the cell
         """
         counter = ''
         av_int = middle_values[2]
@@ -348,6 +346,14 @@ class Localisation(object):
             followed by distance average for each segment in 1-NL_split
             output name is input name with _output added
         """
+        # statistics will throw an error if there are not at least 
+        # two datapoints for standard deviation and mean calculations
+        if len(self.dict1) == 1:
+            key_name = str([key for key in self.dict1]).strip("'[]'")
+            print("Only one cell ("+key_name+")"+" available in "+str(self.input_name)+". Unable to plot.")
+            print()
+            return 'onecell'
+            
         output_name = self.input_name[:-4]+'_output.csv'
         with open(output_name, "w") as g:
             g.write("av_intensity,stdev_intensity,av_distance,stdev_distance\n")

@@ -10,7 +10,6 @@
 import sys
 import os
 from Localisation_code import *
-from textwrap import wrap
 
 #############################################################################
 
@@ -236,7 +235,13 @@ def sort_file(filename, group, file_ext):
                 line = line.split(',')
             
             intensity.append(float(line[int_values]))
-            norm_dist.append(float(line[ndist_values]))    
+            norm_dist.append(float(line[ndist_values]))  
+    
+    # check to make sure normalised distance goes from 0-1 not 1-0
+    if norm_dist[0] == 1 and norm_dist[-1] == 0:
+        norm_dist = norm_dist[::-1]
+        intensity = intensity[::-1]        
+              
     ipiece = str(filename[:-4])+',I,'
     stringI = ipiece + str(intensity).strip("[]")+'\n'
     ndpiece = ",ND,"
@@ -258,9 +263,9 @@ def do_analysis(input_name, operating_system):
     meow.choose_NL_split()     # determine NL_split value using dict1
     meow.make_dict_main()      # initialise dict_main using NL_split
     meow.analyse_dict()        # sort dict1 into dict_main
-    meow.write_dict_main()     # write data into output file
-    meow.plot_data()           # plot data
-    
+    if meow.write_dict_main() != 'onecell': # write data into output file
+        meow.plot_data()           # plot data
+    else: return
     # sort/plot extra data if files are set to be organised by localisation
     # note: each of the three cases is made as a new version of the 
     # Localisation class
@@ -273,22 +278,22 @@ def do_analysis(input_name, operating_system):
         nopole.choose_NL_split()     # determine NL_split value using dict1
         nopole.make_dict_main()      # initialise dict_main using NL_split
         nopole.analyse_dict()        # sort dict1 into dict_main
-        nopole.write_dict_main()     # write data into output file
-        nopole.plot_data()           # plot data
+        if nopole.write_dict_main() != 'onecell': # write data into output file
+            nopole.plot_data()           # plot data
         
         onepole = Localisation(g+'_one_local.csv', operating_system, meow.local1, {},1,False,{},{},{},0,0)
         onepole.choose_NL_split()     # determine NL_split value using dict1
         onepole.make_dict_main()      # initialise dict_main using NL_split
         onepole.analyse_dict()        # sort dict1 into dict_main
-        onepole.write_dict_main()     # write data into output file
-        onepole.plot_data()           # plot data
+        if onepole.write_dict_main() != 'onecell': # write data into output file
+            onepole.plot_data()           # plot data
         
         twopole = Localisation(g+'_two_local.csv', operating_system, meow.local2, {},1,False,{},{},{},0,0)
         twopole.choose_NL_split()     # determine NL_split value using dict1
         twopole.make_dict_main()      # initialise dict_main using NL_split
         twopole.analyse_dict()        # sort dict1 into dict_main
-        twopole.write_dict_main()     # write data into output file
-        twopole.plot_data()           # plot data  
+        if twopole.write_dict_main() != 'onecell': # write data into output file
+            twopole.plot_data()           # plot data 
         
 #############################################################################
 
@@ -296,6 +301,7 @@ def do_analysis(input_name, operating_system):
 print_intro()
 current_OS = det_OS()
 choice = input("Analyse folders of files (1) or pre-formatted csv files (2) ? ")
+print()
 while choice != '1' and choice != '2':
     choice = input("Enter (1) or (2): ")
 
