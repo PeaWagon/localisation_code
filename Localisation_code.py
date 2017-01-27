@@ -14,17 +14,18 @@ from math import sqrt
 
 class Localisation(object):
     
-    def __init__(self, input_name, output_name, dict1, dict_main, NL_split, operating_system, sorter, local0, local1, local2):
+    def __init__(self, input_name, operating_system, dict1, dict_main, NL_split, sorter, local0, local1, local2, dcutoff, pdiff):
         self.input_name = input_name    # name of csv file with cell data
-        self.output_name = output_name  # name of csv file to write final data
+        self.operating_system = operating_system # running on windows/linux
         self.dict1 = dict1              # dictionary containing all cell data
         self.dict_main = dict_main      # dict for bins containing each cell
         self.NL_split = NL_split        # number of data points for graph
-        self.operating_system = operating_system # running on windows/linux
         self.sorter = sorter        # True (do localisation), False (don't)
         self.local0 = local0        # dict of cells with no localisation
         self.local1 = local1        # dict of cells with 1 pole localisation
         self.local2 = local2        # dict of cells with 2 pole localisation
+        self.dcutoff = dcutoff      # distance cutoff
+        self.pdiff = pdiff          # percent difference from middle
     
     def normalise(self, values):
         """ input is a non-normalised list
@@ -85,36 +86,45 @@ class Localisation(object):
             query = input("Sort files by their localisation patterns? (Y/n) ")
         if query == 'Y':
             self.sorter = True
-            self.organise_cells()
-            self.write_cell_local()
+            self.get_local_values() # determine pdiff and dcutoff
+            self.organise_cells()   # sort cells by localisation
+            self.write_cell_local() # write data to a csv file
             return True
         elif query == 'n':
             self.sorter = False
             return False
     
+    def get_local_values(self):
+        """ gets dcutoff and pdiff from user. reprompts for input
+            if the user inputs something wrong
+        """
+        # set dcutoff
+        while True:
+            self.dcutoff = input("Choose a distance cut-off: ")
+            try: self.dcutoff = float(self.dcutoff)
+            except ValueError:
+                print("Please enter numbers only. No special characters or letters.")
+                continue
+            if 0.5 <= self.dcutoff <= 0:
+                print("Value must be larger than 0 and smaller than 0.5. Please try again.")
+                continue
+            break
+        # set pdiff    
+        while True:
+            self.pdiff = input("Choose a percentage difference from average: ")
+            try: self.pdiff = float(self.pdiff)
+            except ValueError:
+                print("Please enter numbers only. No special characters or letters.")
+                continue
+            if self.pdiff <= 0:
+                print("Value must be larger than 0. Please try again.")
+                continue
+            break
+    
     def organise_cells(self):
         """ designates localisation patterns for each cell within 
             a folder/group
-        """
-        while True:
-            try:
-                dist_cutoff = input("Choose a distance cut-off: ")
-                if dist_cutoff == '0':
-                    print("Distance cut-off cannot be zero. Try again.")
-                    continue
-                elif '-' in dist_cutoff:
-                    print("Distance cut-off cannot be negative. Try again.")
-                    continue
-                elif dist_cutoff >= '0.5':
-                    print("Distance cut-off must be less than 0.5. Try again.")
-                    continue
-                percent_diff = input("Choose a percentage difference from average: ")
-                dist_cutoff = float(dist_cutoff)
-                percent_diff = float(percent_diff)
-                break
-            except ValueError:
-                print("Please enter numbers only. No special characters or letters.")
-                
+        """      
         for key in self.dict1:
             """ (1) get distance values between DC and 1-DC
                 (2) get the average of the intensity value
@@ -125,9 +135,9 @@ class Localisation(object):
                 (4) group accordingly (no pole, one pole, two pole)
             
             """
-            middle_values = self.sort_middle(key, dist_cutoff)
+            middle_values = self.sort_middle(key)
            
-            det_localisation = self.sort_cell(key, middle_values, percent_diff)
+            det_localisation = self.sort_cell(key, middle_values)
            
             if det_localisation == 0:
                 self.local0[key] = self.dict1[key]
@@ -144,21 +154,25 @@ class Localisation(object):
                 self.dict1[key][1] = self.dict1[key][1][::-1]
                 # add to local1
                 self.local1[key] = self.dict1[key]
-                
+#### !!!                
     def write_cell_local(self):
         """ (5) write data to .csv file for reference
             (6) print number of cells in each group
         """
         g = str(self.input_name[:-4])
-        with open(g+'_no_local.csv', 'w') as nl:
-            for key0 in sorted(self.local0):
-                nl.write(key0+'\n')
-        with open(g+'_one_local.csv', 'w') as ol:
-            for key1 in sorted(self.local1):
-                ol.write(key1+'\n')
-        with open(g+'_two_local.csv', 'w') as tl:
-            for key2 in sorted(self.local2):
-                tl.write(key2+'\n')
+        
+        with open(g+'_localisation_data.csv', 'w') as l:
+            l.write("Chosen distance cutoff, "+str(self.dcutoff)+'\n')
+            l.write("Chosen percent difference, "+str(self.pdiff)+'\n')
+            l.write(g+" delocalised count, "+str(len(self.local0))+'\n')
+            l.write(g+" one pole count, "+str(len(self.local1))+'\n')
+            l.write(g+" two pole count, "+str(len(self.local2))+'\n')
+            l.write('\n')
+            l.write(g+" delocalised cells, "+', '.join(str(key0) for key0 in sorted(self.local0))+'\n')
+            l.write(g+" one pole cells, "+', '.join(str(key1) for key1 in sorted(self.local1))+'\n')
+            l.write(g+" two pole cells, "+', '.join(str(key2) for key2 in sorted(self.local2))+'\n')
+            l.write('\n')
+        
         print()
         print('Found '+str(len(self.local0))+' delocalised cells in '+str(self.input_name)+'.')   
         print('Found '+str(len(self.local1))+' cells with polar localisation at one pole in '+str(self.input_name)+'.') 
@@ -166,9 +180,9 @@ class Localisation(object):
         print()
     
     
-    def sort_middle(self, key, dist_cutoff):
+    def sort_middle(self, key):
         """ determines the distance values of within the
-            cut-off points (dist_cutoff, 1-dist_cutoff)
+            cut-off points (dcutoff, 1-dcutoff)
             returns a list containing:
             [0] starting middle value index
             [1] ending middle value index
@@ -176,14 +190,29 @@ class Localisation(object):
         """
         key_dists = self.dict1[key][1]
         key_intens = self.dict1[key][0]
-        for i, value in enumerate(key_dists):
-            if value > dist_cutoff:
-                middle_start_index = i
-                break
-        for i, value2 in enumerate(key_dists):
-            if value2 > 1-dist_cutoff:
-                middle_end_index = i-1
-                break        
+        
+        # just in case key's distances are somehow reversed
+        if key_dists[0] == 1.0 and key_dists[-1] == 0:
+            print("Warning. Cell "+str(key)+" has its normalised distance values reversed.")
+            for i, valuea in enumerate(key_dists):
+                if valuea < 1-self.dcutoff:
+                    middle_start_index = i-1
+                    break
+            for i, valueb in enumerate(key_dists):
+                if valueb < self.dcutoff:
+                    middle_end_value = i-1
+                    break
+      
+        # key's normalised distances go from 0-1
+        elif key_dists[0] == 0 and key_dists[-1] == 1.0:
+            for i, value in enumerate(key_dists):
+                if value > self.dcutoff:
+                    middle_start_index = i
+                    break
+            for i, value2 in enumerate(key_dists):
+                if value2 > 1-self.dcutoff:
+                    middle_end_index = i-1
+                    break        
         
         middle_int_values = key_intens[middle_start_index:middle_end_index+1]
         
@@ -193,15 +222,18 @@ class Localisation(object):
         try:
             av_middle = sum(middle_int_values)/len(middle_int_values)
         except ZeroDivisionError:
+            print(self.dict1[key][0])
+            print(self.dict1[key][1])
             print("The cell "+str(key)+' has an empty set of middle values, which has caused a division by zero. Please re-enter the distance cut-off.')
             self.local0 = {}
             self.local1 = {}
             self.local2 = {}
+            self.get_local_values()
             self.organise_cells()
         
         return [middle_start_index, middle_end_index, av_middle]
         
-    def sort_cell(self, key, middle_values, percent_diff):
+    def sort_cell(self, key, middle_values):
         """ returns 0 if no localisation at poles is found
             returns l1 if localisation is found at left pole ONLY
             returns r1 if localisation is found at right pole ONLY
@@ -211,11 +243,11 @@ class Localisation(object):
         av_int = middle_values[2]
         middle_start = middle_values[0]
         middle_end = middle_values[1]
-        int_to_beat = (1+(percent_diff/100))*av_int
+        int_to_beat = (1+(self.pdiff/100))*av_int
         
         # check beginning of cell for intensity values higher 
         # than average intensity value from middle values
-        # times 100+percent_diff%
+        # times 100+pdiff%
         for value in self.dict1[key][0][:middle_start]:
             if value > int_to_beat:
                 counter+='l'
@@ -314,8 +346,10 @@ class Localisation(object):
     def write_dict_main(self):
         """ writes a file containing rows, where each row is intensity average
             followed by distance average for each segment in 1-NL_split
+            output name is input name with _output added
         """
-        with open(self.output_name, "w") as g:
+        output_name = self.input_name[:-4]+'_output.csv'
+        with open(output_name, "w") as g:
             g.write("av_intensity,stdev_intensity,av_distance,stdev_distance\n")
             for i in range(1, self.NL_split+1):
                 key_name = "dict_"+str(i)
