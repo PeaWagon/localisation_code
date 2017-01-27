@@ -243,19 +243,20 @@ class Localisation(object):
         middle_end = middle_values[1]
         int_to_beat = (1+(self.pdiff/100))*av_int
         
+        # first segment of intensity values
+        inten1 = self.dict1[key][0][:middle_start]
+        
+        # last segment of intensity values
+        inten2 = self.dict1[key][0][middle_end+1:]
+        
         # check beginning of cell for intensity values higher 
         # than average intensity value from middle values
         # times 100+pdiff%
-        for value in self.dict1[key][0][:middle_start]:
-            if value > int_to_beat:
-                counter+='l'
-                break
-       
+        if sum(inten1)/len(inten1) > int_to_beat:
+            counter+='l'
         # check end of cell for intensity values as before
-        for value2 in self.dict1[key][0][middle_end+1:]:
-            if value2 > int_to_beat:
-                counter+='r'
-                break
+        if sum(inten2)/len(inten2) > int_to_beat:
+            counter+='r'
         
         if counter == 'lr':
             return 2

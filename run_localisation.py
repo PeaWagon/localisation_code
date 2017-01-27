@@ -265,7 +265,8 @@ def do_analysis(input_name, operating_system):
     meow.analyse_dict()        # sort dict1 into dict_main
     if meow.write_dict_main() != 'onecell': # write data into output file
         meow.plot_data()           # plot data
-    else: return
+    else: return               # if only one cell in dataset, cannot organise
+                               # by localisation
     # sort/plot extra data if files are set to be organised by localisation
     # note: each of the three cases is made as a new version of the 
     # Localisation class
