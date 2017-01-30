@@ -13,6 +13,8 @@ from shutil import copyfile
 from Localisation_code import *
 
 #############################################################################
+# functions for both folders and pre-formatted csv files
+#############################################################################
 
 def print_intro():
     print("******************************************************************")
@@ -42,6 +44,55 @@ def det_OS():
         print("The operating system is not linux or windows. Program may not run successfully.")
         print()
         return 'unknown'
+    
+def do_analysis(input_name, operating_system):
+    """ makes a new member of the Localisation object, writes
+        data to csv files, and plots this data
+    """    
+    g = str(input_name[:-4])
+    
+    meow = Localisation(input_name, operating_system, {},{},1,False,{},{},{},0,0)
+    meow.open_input()          # open input file, complete dict1
+    meow.ask_organise()        # ask whether to organise files by localisation
+    meow.choose_NL_split()     # determine NL_split value using dict1
+    meow.make_dict_main()      # initialise dict_main using NL_split
+    meow.analyse_dict()        # sort dict1 into dict_main
+    if meow.write_dict_main() != 'onecell': # write data into output file
+        meow.plot_data()           # plot data
+    else: return               # if only one cell in dataset, cannot organise
+                               # by localisation
+    # sort/plot extra data if files are set to be organised by localisation
+    # note: each of the three cases is made as a new version of the 
+    # Localisation class
+    # note that since dict1 has already been created for these instances
+    # of the Localisation class, the input name is a placeholder and is
+    # only used to write the name of the output file. Aka these instances
+    # do not call open_input()
+    if meow.sorter == True:
+        nopole = Localisation(g+'_no_local.csv', operating_system, meow.local0, {},1,False,{},{},{},0,0)
+        nopole.choose_NL_split()     # determine NL_split value using dict1
+        nopole.make_dict_main()      # initialise dict_main using NL_split
+        nopole.analyse_dict()        # sort dict1 into dict_main
+        if nopole.write_dict_main() != 'onecell': # write data into output file
+            nopole.plot_data()           # plot data
+        
+        onepole = Localisation(g+'_one_local.csv', operating_system, meow.local1, {},1,False,{},{},{},0,0)
+        onepole.choose_NL_split()     # determine NL_split value using dict1
+        onepole.make_dict_main()      # initialise dict_main using NL_split
+        onepole.analyse_dict()        # sort dict1 into dict_main
+        if onepole.write_dict_main() != 'onecell': # write data into output file
+            onepole.plot_data()           # plot data
+        
+        twopole = Localisation(g+'_two_local.csv', operating_system, meow.local2, {},1,False,{},{},{},0,0)
+        twopole.choose_NL_split()     # determine NL_split value using dict1
+        twopole.make_dict_main()      # initialise dict_main using NL_split
+        twopole.analyse_dict()        # sort dict1 into dict_main
+        if twopole.write_dict_main() != 'onecell': # write data into output file
+            twopole.plot_data()           # plot data 
+
+#############################################################################
+# functions for folders only
+#############################################################################
 
 def get_dir_ID(current_OS):
     """ gets folder identifier for finding text or csv files
@@ -50,10 +101,11 @@ def get_dir_ID(current_OS):
         the identifier in the current directory
     """
     print("Make sure you are in the folder or directory above where you files are stored.")
-    print("Choose an identifier (a piece of text) that is present in all folders that contain cell data, but NOT present in any other folder.")
+    print("Choose an identifier (a piece of text) that is present in all folders that contain cell data.")
+    print("Based on the identifier, the code will enable you to select the folders you wish to analyse.")
     print("For example, if my folders were \"bluecells\", \"red_cells\", and \"green-cells\", I would choose \"cells\" as my identifier.")
     print("If you only have one folder of files, your identifier should be the name of that folder.")
-    print("Do not leave the identifier blank. If there are no common identifiers, please close this program and change the folder names.")
+    print("Do not leave the identifier blank. If there are no common identifiers, either close this program and change the folder names or enter each folder separately.")
     print()
     
     dir_ID = input("Enter your folder identifier: ")
@@ -90,23 +142,36 @@ def make_group_list(dir_ID, current_OS):
     if len(make_list) == 0:
         print("No folders found with identifier "+str(dir_ID)+". Please try again.")
         return 'empty'
-    else: return make_list
-   
-#############################################################################
-# for windows or linux
-#############################################################################
+    else: # loop through folders to make sure all are for analysis
+        print("Looking for folders in: "+str(start_dir))
+        print()
+        print('Folders are: '+str([x[:-4] for x in make_list]))
+        print()
+        make_list2 = make_list[:]   # make sure that looping removes from   
+        for group in make_list:     # a hard copied list 
+            print()
+            print("Would you like to analyse data in folder "+str(group[:-4])+"? The options are:")
+            print("Y = yes to ALL folders in list above")
+            print("y = yes to this folder")
+            print("N = no to ALL folders in the list above")
+            print("n = no to this folder")    
+            check = input()
+            if check == 'N':
+                print("Please give another identifier.")
+                return 'empty'
+            elif check == 'n':
+                make_list2.remove(group)
+            elif check == 'Y':
+                break
+        return make_list2
 
-def prep_for(operating_system, make_list):
+def prep_for(current_OS, make_list):
     """
     """
-    if operating_system == 'windows':
+    if current_OS == 'windows':
 	    start_dir = sys.path[0]
-    elif operating_system == 'linux':
+    elif current_OS == 'linux':
 	    start_dir = os.getcwd()
-    print("Looking for folders in: "+str(start_dir))
-    print()
-    print('Groups are: '+str([x[:-4] for x in make_list]))
-    print()
     
     # loop through items in make_list 
     for i, group in enumerate(make_list):
@@ -147,6 +212,11 @@ def prep_for(operating_system, make_list):
         print('Found '+str(len(group_files_txt))+' text files in '+str(group[:-4])+'.')
         print('Found '+str(len(group_files_csv))+' csv files in '+str(group[:-4])+'.')
         
+        # check to make sure there are files available for analysis
+        if len(group_files_txt) == 0 and len(group_files_csv) == 0:
+            print("No cell file data found in "+g+". Going to next folder.")
+            continue
+        
         group_files = group_files_txt + group_files_csv # catenate two lists
         
         # try to read in the cell data
@@ -160,41 +230,11 @@ def prep_for(operating_system, make_list):
                 group_files.remove(cell_data)
             
         # plot data using Localisation_code
-        do_analysis(group, operating_system)
+        do_analysis(group, current_OS)
         print()
     
     # after all groups have been analysed, return to original directory
     os.chdir(start_dir) 
-
-def get_input_file(operating_system):
-    # get starting directory
-    print("Formatted csv file should be in the current folder (directory).")
-    print("Make sure to include the '.csv' file extension when entering your filename.")
-    if operating_system == 'windows':
-	    sdir = sys.path[0]
-    elif operating_system == 'linux':
-	    sdir = os.getcwd()
-    else:
-        try: 
-            sdir = os.getcwd()
-        except OSError: 
-            sdir = sys.path[0]
-        except: 
-            print("Unable to resolve current working directory.")
-            return 'error'
- 
-    while True:
-        fname = input("Enter the name of your formatted csv file, or enter 'q' to quit: ")
-        print()
-        if fname == 'q':
-            return 'quit'
-        elif os.path.isfile(sdir+'/'+fname) == True:
-            return fname
-        else: print("No such file in current directory. Please try again.")
-    
-#############################################################################
-# Cross-platform code
-#############################################################################
 
 def sort_file(filename, group, file_ext):
     """ this is the sort_file.py code from earlier code analysis
@@ -252,7 +292,38 @@ def sort_file(filename, group, file_ext):
            
     with open(group, 'a') as f2:        
         f2.write(stringI)
-        f2.write(stringND)    
+        f2.write(stringND)   
+
+#############################################################################
+# functions for pre-formatted csv files only
+#############################################################################
+        
+def get_input_file(operating_system):
+    # get starting directory
+    print("Formatted csv file should be in the current folder (directory).")
+    print("Make sure to include the '.csv' file extension when entering your filename.")
+    if operating_system == 'windows':
+	    sdir = sys.path[0]
+    elif operating_system == 'linux':
+	    sdir = os.getcwd()
+    else:
+        try: 
+            sdir = os.getcwd()
+        except OSError: 
+            sdir = sys.path[0]
+        except: 
+            print("Unable to resolve current working directory.")
+            return 'error'
+ 
+    while True:
+        fname = input("Enter the name of your formatted csv file, or enter 'q' to quit: ")
+        print()
+        if fname == 'q':
+            return 'quit'
+        elif os.path.isfile(sdir+'/'+fname) == True:
+            return fname
+        else: print("No such file in current directory. Please try again.")
+
 
 def make_folder(ifile, current_OS):
     """ first make a folder with same name as parent file
@@ -279,55 +350,11 @@ def make_folder(ifile, current_OS):
 	        print("Analysing "+str(ifile))
 	        do_analysis(ifile, current_OS)
 	        os.chdir(sdir)
-	        return
-    
-def do_analysis(input_name, operating_system):
-    """ makes a new member of the Localisation object, writes
-        data to csv files, and plots this data
-    """    
-    g = str(input_name[:-4])
-    
-    meow = Localisation(input_name, operating_system, {},{},1,False,{},{},{},0,0)
-    meow.open_input()          # open input file, complete dict1
-    meow.ask_organise()        # ask whether to organise files by localisation
-    meow.choose_NL_split()     # determine NL_split value using dict1
-    meow.make_dict_main()      # initialise dict_main using NL_split
-    meow.analyse_dict()        # sort dict1 into dict_main
-    if meow.write_dict_main() != 'onecell': # write data into output file
-        meow.plot_data()           # plot data
-    else: return               # if only one cell in dataset, cannot organise
-                               # by localisation
-    # sort/plot extra data if files are set to be organised by localisation
-    # note: each of the three cases is made as a new version of the 
-    # Localisation class
-    # note that since dict1 has already been created for these instances
-    # of the Localisation class, the input name is a placeholder and is
-    # only used to write the name of the output file. Aka these instances
-    # do not call open_input()
-    if meow.sorter == True:
-        nopole = Localisation(g+'_no_local.csv', operating_system, meow.local0, {},1,False,{},{},{},0,0)
-        nopole.choose_NL_split()     # determine NL_split value using dict1
-        nopole.make_dict_main()      # initialise dict_main using NL_split
-        nopole.analyse_dict()        # sort dict1 into dict_main
-        if nopole.write_dict_main() != 'onecell': # write data into output file
-            nopole.plot_data()           # plot data
-        
-        onepole = Localisation(g+'_one_local.csv', operating_system, meow.local1, {},1,False,{},{},{},0,0)
-        onepole.choose_NL_split()     # determine NL_split value using dict1
-        onepole.make_dict_main()      # initialise dict_main using NL_split
-        onepole.analyse_dict()        # sort dict1 into dict_main
-        if onepole.write_dict_main() != 'onecell': # write data into output file
-            onepole.plot_data()           # plot data
-        
-        twopole = Localisation(g+'_two_local.csv', operating_system, meow.local2, {},1,False,{},{},{},0,0)
-        twopole.choose_NL_split()     # determine NL_split value using dict1
-        twopole.make_dict_main()      # initialise dict_main using NL_split
-        twopole.analyse_dict()        # sort dict1 into dict_main
-        if twopole.write_dict_main() != 'onecell': # write data into output file
-            twopole.plot_data()           # plot data 
+	        return        
         
 #############################################################################
-
+# main program execution
+#############################################################################
 
 print_intro()
 current_OS = det_OS()
