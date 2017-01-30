@@ -9,6 +9,7 @@
 
 import sys
 import os
+from shutil import copyfile
 from Localisation_code import *
 
 #############################################################################
@@ -253,6 +254,33 @@ def sort_file(filename, group, file_ext):
         f2.write(stringI)
         f2.write(stringND)    
 
+def make_folder(ifile, current_OS):
+    """ first make a folder with same name as parent file
+        move file to that folder
+        cd to that folder
+        do analysis
+        return to parent directory
+    """
+    if current_OS == 'windows':
+	    sdir = sys.path[0]
+    elif current_OS == 'linux':
+	    sdir = os.getcwd()
+    counter = 1
+    dirname = str(ifile[:-4])
+    while True:
+        if os.path.exists(sdir+'/'+dirname) == True:
+	        dirname = dirname+str(counter)
+	        counter+=1
+        else:
+	        os.makedirs(sdir+'/'+dirname)
+	        print("Moving data to new folder called "+str(dirname))
+	        copyfile(sdir+'/'+ifile, sdir+'/'+dirname+'/'+ifile)
+	        os.chdir(sdir+'/'+dirname)
+	        print("Analysing "+str(ifile))
+	        do_analysis(ifile, current_OS)
+	        os.chdir(sdir)
+	        return
+    
 def do_analysis(input_name, operating_system):
     """ makes a new member of the Localisation object, writes
         data to csv files, and plots this data
@@ -331,9 +359,8 @@ elif choice == '2':
         ifile = get_input_file(current_OS)
         if ifile == 'error' or ifile == 'quit':
             break
-        print("Analysing "+str(ifile))
-        do_analysis(ifile, current_OS)
-    
+        make_folder(ifile, current_OS)
+
 print('Done')
     
     
