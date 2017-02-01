@@ -69,26 +69,29 @@ def do_analysis(input_name, operating_system):
     # only used to write the name of the output file. Aka these instances
     # do not call open_input()
     if meow.sorter == True:
-        nopole = Localisation(g+'_no_local.csv', operating_system, meow.local0, {},1,False,{},{},{},0,0)
-        nopole.choose_NL_split()     # determine NL_split value using dict1
-        nopole.make_dict_main()      # initialise dict_main using NL_split
-        nopole.analyse_dict()        # sort dict1 into dict_main
-        if nopole.write_dict_main() != 'onecell': # write data into output file
-            nopole.plot_data()           # plot data
+        if len(meow.local0) != 0:
+            nopole = Localisation(g+'_no_local.csv', operating_system, meow.local0, {},1,False,{},{},{},0,0)
+            nopole.choose_NL_split()     # determine NL_split value using dict1
+            nopole.make_dict_main()      # initialise dict_main using NL_split
+            nopole.analyse_dict()        # sort dict1 into dict_main
+            if nopole.write_dict_main() != 'onecell': # write data into output file
+                nopole.plot_data()           # plot data
         
-        onepole = Localisation(g+'_one_local.csv', operating_system, meow.local1, {},1,False,{},{},{},0,0)
-        onepole.choose_NL_split()     # determine NL_split value using dict1
-        onepole.make_dict_main()      # initialise dict_main using NL_split
-        onepole.analyse_dict()        # sort dict1 into dict_main
-        if onepole.write_dict_main() != 'onecell': # write data into output file
-            onepole.plot_data()           # plot data
+        if len(meow.local1) != 0:
+            onepole = Localisation(g+'_one_local.csv', operating_system, meow.local1, {},1,False,{},{},{},0,0)
+            onepole.choose_NL_split()     # determine NL_split value using dict1
+            onepole.make_dict_main()      # initialise dict_main using NL_split
+            onepole.analyse_dict()        # sort dict1 into dict_main
+            if onepole.write_dict_main() != 'onecell': # write data into output file
+                onepole.plot_data()           # plot data
         
-        twopole = Localisation(g+'_two_local.csv', operating_system, meow.local2, {},1,False,{},{},{},0,0)
-        twopole.choose_NL_split()     # determine NL_split value using dict1
-        twopole.make_dict_main()      # initialise dict_main using NL_split
-        twopole.analyse_dict()        # sort dict1 into dict_main
-        if twopole.write_dict_main() != 'onecell': # write data into output file
-            twopole.plot_data()           # plot data 
+        if len(meow.local2) != 0:
+            twopole = Localisation(g+'_two_local.csv', operating_system, meow.local2, {},1,False,{},{},{},0,0)
+            twopole.choose_NL_split()     # determine NL_split value using dict1
+            twopole.make_dict_main()      # initialise dict_main using NL_split
+            twopole.analyse_dict()        # sort dict1 into dict_main
+            if twopole.write_dict_main() != 'onecell': # write data into output file
+                twopole.plot_data()           # plot data 
 
 #############################################################################
 # functions for folders only
@@ -336,13 +339,16 @@ def make_folder(ifile, current_OS):
 	    sdir = sys.path[0]
     elif current_OS == 'linux':
 	    sdir = os.getcwd()
-    counter = 1
+    counter = ''
     dirname = str(ifile[:-4])
     while True:
-        if os.path.exists(sdir+'/'+dirname) == True:
-	        dirname = dirname+str(counter)
-	        counter+=1
+        if os.path.exists(sdir+'/'+dirname+str(counter)) == True:
+            if counter == '':
+                counter = 1
+            else: 
+                counter+=1
         else:
+	        dirname = dirname+str(counter)
 	        os.makedirs(sdir+'/'+dirname)
 	        print("Moving data to new folder called "+str(dirname))
 	        copyfile(sdir+'/'+ifile, sdir+'/'+dirname+'/'+ifile)
