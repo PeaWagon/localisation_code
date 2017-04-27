@@ -15,7 +15,7 @@ As for the code:
 2. Download the two files: Localisation_code.py and run_localisation.py to this location.
 3. Open cmd (command prompt). You can find this program by pressing the windows button and typing "command prompt".
 4. Using cmd, go to the folder where the code is saved (the one above the cell folder files or the one containing pre-formatted .csv files). For help on navigating file systems using cmd, see CMD Notes below.
-5. Type "python run_localisation"
+5. Type "python run_localisation.py"
 6. Reply to prompts, images should autogenerate.  
 
 ## FOR LINUX
