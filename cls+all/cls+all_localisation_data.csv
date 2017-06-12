@@ -1,0 +1,10 @@
+Chosen distance cutoff, 0.15
+Chosen percent difference, 20.0
+cls+all delocalised count, 51
+cls+all one pole count, 42
+cls+all two pole count, 7
+
+cls+all delocalised cells, 10, 12, 21, 22, 27, 28, 29, 30, 34, 35, 36, 37, 38, 39, 40, 42, 46, 47, 48, 50, 51, 53, 55, 56, 60, 61, 65, 68, 69, 71, 73, 74, 76, 77, 78, 79, 81, 82, 83, 84, 85, 86, 87, 88, 8_1, 8_4, 8_7, l, m, s, u
+cls+all one pole cells, 1, 11, 14, 2, 20, 23, 24, 25, 3, 31, 41, 44, 45, 49, 52, 58, 62, 64, 66, 67, 70, 72, 75, 80, 8_3, 8_5, a, b, c, d, e, f, g, h, j, k, n, q, r, t, v, z
+cls+all two pole cells, 33, 54, 59, 7, 8_2, o, y
+
