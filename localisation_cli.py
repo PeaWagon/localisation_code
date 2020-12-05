@@ -1,16 +1,9 @@
-#!/usr/bin/python3.5
-
-# this code will replace bashhelp.bash
-# it will be used for getting the names of the files for analysis
-# using python.
-# it will hopefully work on Windows OS and Linux OS
-
-#############################################################################
+# utf-8 encoding
 
 import sys
 import os
 from shutil import copyfile
-from Localisation_code import *
+from localisation import *
 from copy import deepcopy
 
 #############################################################################
@@ -18,33 +11,37 @@ from copy import deepcopy
 #############################################################################
 
 def print_intro():
-    print("******************************************************************")
-    print("Welcome to Jen's cell localisation data analysis.")
-    print("Please have python version 3 installed on your home computer.")
-    print("You will also need the following libraries installed: matplotlib, numpy.")
-    print("These libraries will come installed by default if using Anaconda python.")
-    print("At any point, you can stop this program by pressing \'ctrl Z\'.")
-    print("******************************************************************")
-    print()
+    print(
+        66 * "*",
+        "Welcome to Jen's cell localisation data analysis.",
+        "Please have python version 3 installed on your home computer.",
+        "You will also need the following libraries installed: matplotlib, numpy.",
+        "These libraries will come installed by default if using Anaconda python.",
+        "At any point, you can stop this program by pressing \"ctrl Z\".",
+        66 * "*\n", sep="\n"
+    )
 
 # determine OS
 def det_OS():
-    if sys.platform == "linux":                     # linux
-        print("The operating system is linux.")
+    if sys.platform == "linux":
+        print("The operating system is Linux.\n")
         print()
-        return 'linux'
-    elif sys.platform == 'win32':                   # windows
-        print("The operating system is windows.")
-        print()
-        return 'windows'
-    elif sys.platform == 'darwin':                  # Mac OS X
-        print("The operating system is Mac OS X. The code will try to run using linux commands.")
-        print()
-        return 'linux'
+        return "linux"
+    elif sys.platform == "win32":
+        print("The operating system is Windows.\n")
+        return "windows"
+    elif sys.platform == "darwin":
+        print(
+            "The operating system is Mac OS X.",
+            "The code will try to run using linux commands.\n"
+        )
+        return "linux"
     else:
-        print("The operating system is not linux or windows. Program may not run successfully.")
-        print()
-        return 'unknown'
+        print(
+            "The operating system is not linux or windows.",
+            "Program may not run successfully.\n"
+        )
+        return "unknown"
     
 def do_analysis(input_name, operating_system):
     """ makes a new member of the Localisation object, writes
@@ -61,7 +58,7 @@ def do_analysis(input_name, operating_system):
     meow.choose_NL_split()     # determine NL_split value using dict1
     meow.make_dict_main()      # initialise dict_main using NL_split
     meow.analyse_dict()        # sort dict1 into dict_main
-    if meow.write_dict_main() != 'onecell': # write data into output file
+    if meow.write_dict_main() != "onecell": # write data into output file
         meow.plot_data()           # plot data
     else: return               # if only one cell in dataset, cannot organise
                                # by localisation
@@ -74,27 +71,27 @@ def do_analysis(input_name, operating_system):
     # do not call open_input()
     if meow.sorter == True:
         if len(meow.local0) != 0:
-            nopole = Localisation(g+'_no_local.csv', operating_system, meow.local0, {},1,False,{},{},{},0,0)
+            nopole = Localisation(g+"_no_local.csv", operating_system, meow.local0, {},1,False,{},{},{},0,0)
             nopole.choose_NL_split()     # determine NL_split value using dict1
             nopole.make_dict_main()      # initialise dict_main using NL_split
             nopole.analyse_dict()        # sort dict1 into dict_main
-            if nopole.write_dict_main() != 'onecell': # write data into output file
+            if nopole.write_dict_main() != "onecell": # write data into output file
                 nopole.plot_data()           # plot data
         
         if len(meow.local1) != 0:
-            onepole = Localisation(g+'_one_local.csv', operating_system, meow.local1, {},1,False,{},{},{},0,0)
+            onepole = Localisation(g+"_one_local.csv", operating_system, meow.local1, {},1,False,{},{},{},0,0)
             onepole.choose_NL_split()     # determine NL_split value using dict1
             onepole.make_dict_main()      # initialise dict_main using NL_split
             onepole.analyse_dict()        # sort dict1 into dict_main
-            if onepole.write_dict_main() != 'onecell': # write data into output file
+            if onepole.write_dict_main() != "onecell": # write data into output file
                 onepole.plot_data()           # plot data
         
         if len(meow.local2) != 0:
-            twopole = Localisation(g+'_two_local.csv', operating_system, meow.local2, {},1,False,{},{},{},0,0)
+            twopole = Localisation(g+"_two_local.csv", operating_system, meow.local2, {},1,False,{},{},{},0,0)
             twopole.choose_NL_split()     # determine NL_split value using dict1
             twopole.make_dict_main()      # initialise dict_main using NL_split
             twopole.analyse_dict()        # sort dict1 into dict_main
-            if twopole.write_dict_main() != 'onecell': # write data into output file
+            if twopole.write_dict_main() != "onecell": # write data into output file
                 twopole.plot_data()           # plot data 
 
         # combine one pole and two pole into polar category
@@ -103,7 +100,7 @@ def do_analysis(input_name, operating_system):
             p2 = deepcopy(meow.local2)
             for item in p2:
                 p1[item] = p2[item][:]
-            polar = Localisation(g+'_polar.csv', operating_system,p1,{},1,False,{},{},{},0,0)
+            polar = Localisation(g+"_polar.csv", operating_system,p1,{},1,False,{},{},{},0,0)
             polar.choose_NL_split()
             polar.make_dict_main()
             polar.analyse_dict()
@@ -117,7 +114,7 @@ def do_analysis(input_name, operating_system):
 def get_dir_ID(current_OS):
     """ gets folder identifier for finding text or csv files
         then finds if the folders matching that identifier
-        returns 'empty' if there are no folders matching
+        returns "empty" if there are no folders matching
         the identifier in the current directory
     """
     print("Make sure you are in the folder or directory above where you files are stored.")
@@ -130,42 +127,42 @@ def get_dir_ID(current_OS):
     
     dir_ID = input("Enter your folder identifier: ")
     
-    if dir_ID == '': return 'error'
-    elif dir_ID in '__pycache__': 
+    if dir_ID == "": return "error"
+    elif dir_ID in "__pycache__": 
         print("Identifier cannot be part of \"__pycache__\". Please try again.")
-        return 'error'
+        return "error"
     make_list = make_group_list(dir_ID, current_OS)
-    if make_list == 'empty':
-        return 'error'
+    if make_list == "empty":
+        return "error"
     else: return make_list
 
 def make_group_list(dir_ID, current_OS):    
     make_list = []     # category of files based on directory (folder) name
     # save all files and folders to list, pull the ones matching dir_ID
    
-    if current_OS == 'windows':
+    if current_OS == "windows":
 	    start_dir = sys.path[0]
-    elif current_OS == 'linux':
+    elif current_OS == "linux":
 	    start_dir = os.getcwd()
     
     ls_all = os.listdir(start_dir)
     for ff in ls_all:
         if dir_ID in ff:
-            # try to open the folder, otherwise it's a file
+            # try to open the folder, otherwise it"s a file
             try:
                 os.chdir(ff)        # try to cd to folder
                 os.chdir(start_dir) # if successful, return to start_dir
-                make_list.append(ff+'.csv')
+                make_list.append(ff+".csv")
             except (NotADirectoryError, FileNotFoundError) as e:
                 print(ff+" is not a directory. Skipping.")
     # if no folders are found, return error
     if len(make_list) == 0:
         print("No folders found with identifier "+str(dir_ID)+". Please try again.")
-        return 'empty'
+        return "empty"
     else: # loop through folders to make sure all are for analysis
         print("Looking for folders in: "+str(start_dir))
         print()
-        print('Folders are: '+str([x[:-4] for x in make_list]))
+        print("Folders are: "+str([x[:-4] for x in make_list]))
         print()
         make_list2 = make_list[:]   # make sure that looping removes from   
         for group in make_list:     # a hard copied list 
@@ -176,12 +173,12 @@ def make_group_list(dir_ID, current_OS):
             print("N = no to ALL folders in the list above")
             print("n = no to this folder")    
             check = input()
-            if check == 'N':
+            if check == "N":
                 print("Please give another identifier.")
-                return 'empty'
-            elif check == 'n':
+                return "empty"
+            elif check == "n":
                 make_list2.remove(group)
-            elif check == 'Y':
+            elif check == "Y":
                 break
         return make_list2
 
@@ -193,46 +190,46 @@ def prep_for(current_OS, make_list):
         a list become deleted while iterating through
         said list
     """
-    if current_OS == 'windows':
+    if current_OS == "windows":
 	    start_dir = sys.path[0]
-    elif current_OS == 'linux':
+    elif current_OS == "linux":
 	    start_dir = os.getcwd()
     
     # loop through items in make_list 
     for i, group in enumerate(make_list):
         group_files_txt = []                    # initialize names list
         group_files_csv = []
-        new_dir = start_dir+'/'+str(group[:-4]) # get rid of .csv
+        new_dir = start_dir+"/"+str(group[:-4]) # get rid of .csv
         os.chdir(new_dir)                       # go to group directory
         g = str(group[:-4])      # group name with .csv removed
         
         # prevents adding new data to old dataset
         # prevents trying to read in csv data that is not for a cell
         print("Removing old instances of csv files.")
-        if os.path.isfile(new_dir+'/'+str(group)) == True:
-            os.remove(new_dir+'/'+str(group))
-        if os.path.isfile(new_dir+'/'+g+'_output.csv') == True:
-            os.remove(new_dir+'/'+g+'_output.csv')
-        if os.path.isfile(new_dir+'/'+g+'_localisation_data.csv') == True:
-            os.remove(new_dir+'/'+g+'_localisation_data.csv')
-        if os.path.isfile(new_dir+'/'+g+'_no_local_output.csv') == True:
-            os.remove(new_dir+'/'+g+'_no_local_output.csv')
-        if os.path.isfile(new_dir+'/'+g+'_one_local_output.csv') == True:
-            os.remove(new_dir+'/'+g+'_one_local_output.csv')
-        if os.path.isfile(new_dir+'/'+g+'_two_local_output.csv') == True:
-            os.remove(new_dir+'/'+g+'_two_local_output.csv')
-        if os.path.isfile(new_dir+'/'+g+'_polar_output.csv') == True:
-            os.remove(new_dir+'/'+g+'_polar_output.csv')
+        if os.path.isfile(new_dir+"/"+str(group)) == True:
+            os.remove(new_dir+"/"+str(group))
+        if os.path.isfile(new_dir+"/"+g+"_output.csv") == True:
+            os.remove(new_dir+"/"+g+"_output.csv")
+        if os.path.isfile(new_dir+"/"+g+"_localisation_data.csv") == True:
+            os.remove(new_dir+"/"+g+"_localisation_data.csv")
+        if os.path.isfile(new_dir+"/"+g+"_no_local_output.csv") == True:
+            os.remove(new_dir+"/"+g+"_no_local_output.csv")
+        if os.path.isfile(new_dir+"/"+g+"_one_local_output.csv") == True:
+            os.remove(new_dir+"/"+g+"_one_local_output.csv")
+        if os.path.isfile(new_dir+"/"+g+"_two_local_output.csv") == True:
+            os.remove(new_dir+"/"+g+"_two_local_output.csv")
+        if os.path.isfile(new_dir+"/"+g+"_polar_output.csv") == True:
+            os.remove(new_dir+"/"+g+"_polar_output.csv")
                     
         # set all files to a list, collect subset of text files (.txt)
         print("Analysing files in: "+str(group[:-4]))
-        print("If there are any unrelated '.txt' or '.csv' files in this folder, this may cause errors. Open files may also cause errors.")
+        print("If there are any unrelated ".txt" or ".csv" files in this folder, this may cause errors. Open files may also cause errors.")
         print()
-        ls_all_subdir = os.listdir(start_dir+'/'+str(group[:-4]))
+        ls_all_subdir = os.listdir(start_dir+"/"+str(group[:-4]))
         for ff_subdir in ls_all_subdir:
-            if '.txt' in ff_subdir:
+            if ".txt" in ff_subdir:
                 group_files_txt.append(ff_subdir)
-            elif '.csv' in ff_subdir:
+            elif ".csv" in ff_subdir:
                 group_files_csv.append(ff_subdir)
         
         # debug list of text files
@@ -241,8 +238,8 @@ def prep_for(current_OS, make_list):
         #print("*")
         
         # sort all files in group_files using sort_file
-        print('Found '+str(len(group_files_txt))+' text files in '+str(group[:-4])+'.')
-        print('Found '+str(len(group_files_csv))+' csv files in '+str(group[:-4])+'.', '\n')
+        print("Found "+str(len(group_files_txt))+" text files in "+str(group[:-4])+".")
+        print("Found "+str(len(group_files_csv))+" csv files in "+str(group[:-4])+".", "\n")
         
         # check to make sure there are files available for analysis
         if len(group_files_txt) == 0 and len(group_files_csv) == 0:
@@ -261,16 +258,16 @@ def prep_for(current_OS, make_list):
             try: 
                 sort_file(cell_data, group, cell_data[-4:])
             except ValueError as e: 
-                print("Unable to process file: "+str(cell_data)+' from group '+str(group[:-4]))
+                print("Unable to process file: "+str(cell_data)+" from group "+str(group[:-4]))
                 print(e.args[0])
                 poopy_cells.append(cell_data)
             else:
                 cell_count += 1 # if sorting of file is successful, increment
         
-        print('\n', 'Cells processed: ', cell_count, sep='')
+        print("\n", "Cells processed: ", cell_count, sep="")
         if len(poopy_cells) != 0:
-            print("Cells not processed: ", end='')
-            print(', '.join(poopy_cells), '\n')
+            print("Cells not processed: ", end="")
+            print(", ".join(poopy_cells), "\n")
         if not cell_count:      # no cells were successfully sorted
             print("Unable to process any of the cell files.")
         else:  
@@ -296,22 +293,22 @@ def sort_file(filename, group, file_ext):
     """
     intensity = []
     norm_dist = []
-    #print("Sorting file "+str(filename)+' from group '+str(group)+'.')
+    #print("Sorting file "+str(filename)+" from group "+str(group)+".")
     
     headers = False
-    with open(filename, 'r', encoding = "ISO-8859-15") as ftxt: 
+    with open(filename, "r", encoding = "ISO-8859-15") as ftxt: 
         for line in ftxt: 
-            if 'Normalized Distance' in line and 'Intensity' in line:
+            if "Normalized Distance" in line and "Intensity" in line:
                 headers = True
                 # make line comma separated and a list
-                if file_ext == '.txt':
-                    line = line.replace('\t',',').split(',')
-                elif file_ext == '.csv':
-                    line = line.split(',')
+                if file_ext == ".txt":
+                    line = line.replace("\t",",").split(",")
+                elif file_ext == ".csv":
+                    line = line.split(",")
                 
                 # check to make sure neither of the important
                 # columns include /n by removing it
-                if line[-1][-1:] == '\n':
+                if line[-1][-1:] == "\n":
                     line[-1] = line[-1][:-1]
                 
                 # find where intensity data is
@@ -320,20 +317,20 @@ def sort_file(filename, group, file_ext):
                 ndist_values = line.index("Normalized Distance")
                 break
 
-        if not headers:     # couldn't find ND or I in the file
+        if not headers:     # couldn"t find ND or I in the file
             print("File "+str(filename)+" may not contain columns for Normalized Distance and Intensity.")
             raise ValueError("Missing Columns")        
                 
-    with open(filename, 'r', encoding = "ISO-8859-15") as f:        
+    with open(filename, "r", encoding = "ISO-8859-15") as f:        
         for line in f:
-            if line.replace("\t", ",").split(',') == ['\n']:
+            if line.replace("\t", ",").split(",") == ["\n"]:
                 continue                # ignore empty lines
-            elif 'Normalized Distance' in line:
+            elif "Normalized Distance" in line:
                 continue                # ignore header
-            elif file_ext == '.txt':
-                line = line.replace("\t", ",").split(',')
-            elif file_ext == '.csv':
-                line = line.split(',')
+            elif file_ext == ".txt":
+                line = line.replace("\t", ",").split(",")
+            elif file_ext == ".csv":
+                line = line.split(",")
             
             intensity.append(float(line[int_values]))
             norm_dist.append(float(line[ndist_values]))  
@@ -343,12 +340,12 @@ def sort_file(filename, group, file_ext):
         norm_dist = norm_dist[::-1]
         intensity = intensity[::-1]        
               
-    ipiece = str(filename[:-4])+',I,'
-    stringI = ipiece + str(intensity).strip("[]")+'\n'
+    ipiece = str(filename[:-4])+",I,"
+    stringI = ipiece + str(intensity).strip("[]")+"\n"
     ndpiece = ",ND,"
-    stringND = ndpiece + str(norm_dist).strip("[]")+'\n'
+    stringND = ndpiece + str(norm_dist).strip("[]")+"\n"
            
-    with open(group, 'a') as f2:        
+    with open(group, "a") as f2:        
         f2.write(stringI)
         f2.write(stringND)   
 
@@ -359,10 +356,10 @@ def sort_file(filename, group, file_ext):
 def get_input_file(operating_system):
     # get starting directory
     print("Formatted csv file should be in the current folder (directory).")
-    print("Make sure to include the '.csv' file extension when entering your filename.")
-    if operating_system == 'windows':
+    print("Make sure to include the ".csv" file extension when entering your filename.")
+    if operating_system == "windows":
 	    sdir = sys.path[0]
-    elif operating_system == 'linux':
+    elif operating_system == "linux":
 	    sdir = os.getcwd()
     else:
         try: 
@@ -371,14 +368,14 @@ def get_input_file(operating_system):
             sdir = sys.path[0]
         except: 
             print("Unable to resolve current working directory.")
-            return 'error'
+            return "error"
  
     while True:
-        fname = input("Enter the name of your formatted csv file, or enter 'q' to quit: ")
+        fname = input("Enter the name of your formatted csv file, or enter "q" to quit: ")
         print()
-        if fname == 'q':
-            return 'quit'
-        elif os.path.isfile(sdir+'/'+fname) == True:
+        if fname == "q":
+            return "quit"
+        elif os.path.isfile(sdir+"/"+fname) == True:
             return fname
         else: print("No such file in current directory. Please try again.")
 
@@ -390,24 +387,24 @@ def make_folder(ifile, current_OS):
         do analysis
         return to parent directory
     """
-    if current_OS == 'windows':
+    if current_OS == "windows":
 	    sdir = sys.path[0]
-    elif current_OS == 'linux':
+    elif current_OS == "linux":
 	    sdir = os.getcwd()
-    counter = ''
+    counter = ""
     dirname = str(ifile[:-4])
     while True:
-        if os.path.exists(sdir+'/'+dirname+str(counter)) == True:
-            if counter == '':
+        if os.path.exists(sdir+"/"+dirname+str(counter)) == True:
+            if counter == "":
                 counter = 1
             else: 
                 counter+=1
         else:
 	        dirname = dirname+str(counter)
-	        os.makedirs(sdir+'/'+dirname)
+	        os.makedirs(sdir+"/"+dirname)
 	        print("Moving data to new folder called "+str(dirname))
-	        copyfile(sdir+'/'+ifile, sdir+'/'+dirname+'/'+ifile)
-	        os.chdir(sdir+'/'+dirname)
+	        copyfile(sdir+"/"+ifile, sdir+"/"+dirname+"/"+ifile)
+	        os.chdir(sdir+"/"+dirname)
 	        print("Analysing "+str(ifile))
 	        do_analysis(ifile, current_OS)
 	        os.chdir(sdir)
@@ -421,35 +418,35 @@ print_intro()
 current_OS = det_OS()
 choice = input("Analyse folders of files (1) or pre-formatted csv files (2) ? ")
 print()
-while choice != '1' and choice != '2':
+while choice != "1" and choice != "2":
     choice = input("Enter (1) or (2): ")
 
-if choice == '1':
-    if current_OS == 'linux' or current_OS == 'windows':    
+if choice == "1":
+    if current_OS == "linux" or current_OS == "windows":    
         make_list = get_dir_ID(current_OS)
-        while make_list == 'error':
+        while make_list == "error":
             make_list = get_dir_ID(current_OS)
         prep_for(current_OS, make_list)
     else: 
         try: 
             make_list = get_dir_ID(current_OS)
-            while make_list == 'error':
+            while make_list == "error":
                 make_list = get_dir_ID()
-            prep_for('linux', make_list)
+            prep_for("linux", make_list)
         except: 
             make_list = get_dir_ID(current_OS)
-            while make_list == 'error':
+            while make_list == "error":
                 make_list = get_dir_ID()            
-            prep_for('windows', make_list)   
+            prep_for("windows", make_list)   
 
-elif choice == '2':
+elif choice == "2":
     while True:
         ifile = get_input_file(current_OS)
-        if ifile == 'error' or ifile == 'quit':
+        if ifile == "error" or ifile == "quit":
             break
         make_folder(ifile, current_OS)
 
-print('Done')
+print("Done")
     
     
     

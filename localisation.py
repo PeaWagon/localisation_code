@@ -1,9 +1,4 @@
-# object orientated programming version of analysis code for cells
-
-# JEN
-# January 27th, 2017
-
-############################################################################
+# utf-8 encoding
 
 from statistics import stdev, mean
 from matplotlib import pyplot as pl
@@ -395,10 +390,6 @@ class Localisation(object):
                 line = str(av_intensity)+','+str(stdev_intensity)+','+str(av_dist)+','+str(stdev_dist)+'\n'
                 g.write(line)
     
-
-
-            
-    
     def plot_data(self):
         """ uses matplotlib to make pictures with shading for y-error
             from http://stackoverflow.com/questions/12957582/matplotlib-plot-
@@ -451,10 +442,4 @@ class Localisation(object):
         pl.xlabel("Normalized Cell Length",**csfont)
         pl.ylabel("Normalized Fluorescence Intensity",**csfont)
         pl.savefig(oname,dpi=300)
-        pl.close()
-        
-#############################################################################
-
-
-
-        
+        pl.close()   
